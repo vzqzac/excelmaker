@@ -1,0 +1,11 @@
+{
+  "name": "excelmaker",
+  "version": "0.0.1",
+  "description": "An api that creates an excel table from a firebase instance that parses to JSON",
+  "main": "index.js",
+  "scripts": {
+    "test": "standard"
+  },
+  "author": "ONDECODE",
+  "license": "ISC"
+}
