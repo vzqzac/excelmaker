@@ -7,5 +7,12 @@
     "test": "standard"
   },
   "author": "ONDECODE",
-  "license": "ISC"
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.14.0",
+    "json2xls": "^0.1.2"
+  },
+  "devDependencies": {
+    "standard": "^8.6.0"
+  }
 }
