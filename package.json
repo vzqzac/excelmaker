@@ -4,12 +4,14 @@
   "description": "An api that creates an excel table from a firebase instance that parses to JSON",
   "main": "index.js",
   "scripts": {
+    "start": "node index.js",
     "test": "standard"
   },
   "author": "ONDECODE",
   "license": "ISC",
   "dependencies": {
     "express": "^4.14.0",
+    "firebase-admin": "^4.0.4",
     "json2xls": "^0.1.2"
   },
   "devDependencies": {
