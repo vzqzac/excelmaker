@@ -28,7 +28,7 @@ module.exports = {
           jsonArr.push(prettyTitles)
         }
       }
-      res.xls('test.xlsx', jsonArr)
+      res.xls(appName + Date.now() + '.xlsx', jsonArr)
     })
   }
 }
