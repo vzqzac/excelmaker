@@ -3,7 +3,6 @@
  * function actionHandler() <- TODO
  */
 
-const json2xls = require('json2xls')
 const fbase = require('../fbase/handler')
 const columnTitle = require('../helpers/column-titles.json')
 
