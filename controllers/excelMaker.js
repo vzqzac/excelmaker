@@ -5,6 +5,7 @@
 
 const json2xls = require('json2xls')
 const fbase = require('../fbase/handler')
+const columnTitle = require('../helpers/column-titles.json')
 
 module.exports = {
   dbHandler: function (req, res) {
@@ -15,9 +16,16 @@ module.exports = {
     db.ref().child('businesses/' + businessID + '/information/' + tableName).once('value').then(function (tableObj) {
       let tableInfo = tableObj.val()
       let jsonArr = []
-      for (var key in tableInfo) {
+      for (let key in tableInfo) {
         if (tableInfo.hasOwnProperty(key)) {
-          jsonArr.push(tableInfo[key])
+          let child = tableInfo[key]
+          let prettyTitles = {}
+          for (let childKey in child) {
+            if (childKey !== 'created_at') {
+              prettyTitles[columnTitle[childKey]] = child[childKey]
+            }
+          }
+          jsonArr.push(prettyTitles)
         }
       }
       res.xls('test.xlsx', jsonArr)

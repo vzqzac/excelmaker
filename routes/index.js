@@ -10,7 +10,7 @@ module.exports = function (app) {
   })
 
   router.route('/convert-table/:appName/:businessID/:tableName')
-    .get(function (req, res) {
+    .get(function (req, res) { // GET only for testing purposes, it has to be POST
       excelMakerController.dbHandler(req, res)
     })
 
