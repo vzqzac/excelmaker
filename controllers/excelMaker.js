@@ -5,6 +5,10 @@
 
 const fbase = require('../fbase/handler')
 const columnTitle = require('../helpers/column-titles.json')
+const json2csv = require('json2csv')
+const path = require('path')
+const fs = require('fs')
+const tablesPath = path.join(__dirname, '../tables')
 
 module.exports = {
   dbHandler: function (req, res) {
@@ -27,7 +31,16 @@ module.exports = {
           jsonArr.push(prettyTitles)
         }
       }
-      res.xls(tableName + '.xlsx', jsonArr)
+
+      let result = json2csv({data: jsonArr})
+      let newTablePath = path.join(tablesPath, tableName + '.csv')
+      if (!fs.existsSync(tablesPath)) {
+        fs.mkdirSync(tablesPath)
+      }
+      fs.writeFileSync(newTablePath, result)
+      res.download(newTablePath)
+
+      // res.xls(tableName + '.xlsx', jsonArr)
     })
   }
 }

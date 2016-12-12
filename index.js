@@ -5,7 +5,6 @@ const app = express()
 const bodyParser = require('body-parser')
 const firebase = require('./fbase/handler')
 const routes = require('./routes/index')
-const json2xls = require('json2xls')
 
 let port = process.env.PORT || 3000
 
