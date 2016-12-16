@@ -10,8 +10,18 @@ module.exports = function (app) {
   })
 
   router.route('/convert-table/:appName/:businessID/:tableName')
-    .get(function (req, res) { // GET only for testing purposes, it has to be POST
-      excelMakerController.dbHandler(req, res)
+    .all(function (req, res, next) {
+      excelMakerController.dataHandler(req, res).dbData.then(data => {
+          req.xlsTable = excelMakerController.convertTable(data)
+          next()
+        })
+        .catch(error => res.status(204).send('Null data'))
+      })
+    .get(function (req, res) {
+      excelMakerController.downloadTable(req, res)
+    })
+    .post(function (req, res) {
+      excelMakerController.emailTable(req, res)
     })
 
   app.use('/', router)

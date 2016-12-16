@@ -18,7 +18,6 @@ module.exports = {
     }, 'ez-table')
   },
   // inlete: inleteApp.database(),
-  ezTable: function () {
-    return ezTableApp.database()
-  }
+  ezTable: () => ezTableApp.database().ref(),
+  fetchData: (db, childPath) => db.child(childPath).once('value').then((childObj) => childObj.val())
 }

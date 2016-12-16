@@ -6,7 +6,7 @@ const bodyParser = require('body-parser')
 const firebase = require('./fbase/handler')
 const routes = require('./routes/index')
 
-let port = process.env.PORT || 3000
+let port = process.env.PORT || 300
 
 app.use(bodyParser.urlencoded({ extended: true }))
 app.use(bodyParser.json())
