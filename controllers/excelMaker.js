@@ -38,9 +38,14 @@ module.exports = {
         let prettyTitles = {}
         for (let childKey in dataChild) {
           if (childKey !== 'created_at') {
-            prettyTitles[columnTitles[childKey]] = dataChild[childKey]
             if (typeof dataChild[childKey] === 'object') {
-              // TODO Check for entities
+              for (let innerChKey in dataChild[childKey]) {
+                if (childKey !== 'created_at') {
+                  prettyTitles[columnTitles[childKey] + ' ' + columnTitles[innerChKey]] = dataChild[childKey][innerChKey]
+                }
+              }
+            } else {
+              prettyTitles[columnTitles[childKey]] = dataChild[childKey]
             }
           }
         }
@@ -50,10 +55,8 @@ module.exports = {
     return json2csv({data: jsonArr})
   },
   emailTable: function (request, response) {
-    /*
-     * AWS test
-     */
-    // AWS.config.loadFromPath('./aws/config.json')
+
+    AWS.config.loadFromPath('./aws/config.json')
     let s3 = new AWS.S3()
     let params = {
       Bucket: 'ez-table',
