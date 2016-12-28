@@ -13,16 +13,13 @@ const http = require('http')
 const querystring = require('querystring')
 const AWS = require('aws-sdk')
 
-let xlsResult
 let newTablePath
 
 module.exports = {
   dataHandler: function (req, res) {
-    let self = this
     let appName = req.params.appName
     let businessID = req.params.businessID
     let tableName = req.params.tableName
-    let action = req.query.action
     let db = fbase[appName]()
     let fetchedData = fbase.fetchData(db, 'businesses/' + businessID + '/information/' + tableName).then(data => data)
     return {
@@ -55,8 +52,8 @@ module.exports = {
     return json2csv({data: jsonArr})
   },
   emailTable: function (request, response) {
-
     AWS.config.loadFromPath('./aws/config.json')
+
     let s3 = new AWS.S3()
     let params = {
       Bucket: 'ez-table',
@@ -86,7 +83,7 @@ module.exports = {
       }
     }
     console.log('before call to other api')
-    req = http.request(options, res => {
+    let req = http.request(options, res => {
       response.sendStatus(res.statusCode)
       res.setEncoding('utf8')
     })
@@ -96,7 +93,7 @@ module.exports = {
     req.end()
   },
   downloadTable: function (req, res) {
-    resultTable = req.xlsTable
+    const resultTable = req.xlsTable
 
     newTablePath = path.join(tablesPath, req.params.tableName + '.csv')
 
