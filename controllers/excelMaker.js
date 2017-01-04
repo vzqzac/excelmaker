@@ -52,7 +52,7 @@ module.exports = {
     return json2csv({data: jsonArr})
   },
   emailTable: function (request, response) {
-    AWS.config.loadFromPath('./aws/config.json')
+    //AWS.config.loadFromPath('./aws/config.json')
 
     let s3 = new AWS.S3()
     let params = {
