@@ -22,6 +22,7 @@ module.exports = {
     let appName = req.params.appName
     let businessID = req.params.businessID
     let tableName = req.params.tableName
+    console.log(appName, businessID, tableName);
     let db = fbase[appName]()
     return fbase.fetchData(db, ['businesses/', businessID, '/default/entities/', tableName, '/columns/', (req.entity || '')].join(''))
   },
