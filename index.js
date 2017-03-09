@@ -11,8 +11,10 @@ let port = process.env.PORT || 3000
 app.use(bodyParser.urlencoded({ extended: true }))
 app.use(bodyParser.json())
 
+// Init firebase references
 firebase.initApps()
 
+// Set router
 routes(app)
 
 app.listen(port, function (error) {
