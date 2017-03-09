@@ -17,15 +17,18 @@ const AWS = require('aws-sdk')
 let newTablePath
 
 module.exports = {
+  // NOTE: this could me moved into a 'UTIL' module
   getColumns: function (req, res) {
     let appName = req.params.appName
     let businessID = req.params.businessID
     let tableName = req.params.tableName
+    console.log(appName, businessID, tableName);
     let db = fbase[appName]()
     return fbase.fetchData(db, ['businesses/', businessID, '/default/entities/', tableName, '/columns/', (req.entity || '')].join(''))
   },
 
   sortData: function (data) {
+    // Sort by column order and map it to get only each column key
     return data
       .sort((a, b) => {
         if (a.order > b.order) return 1
@@ -35,6 +38,7 @@ module.exports = {
       .map(e => e.key)
   },
 
+  // NOTE: this could me moved into a 'UTIL' module
   getRows: function (req, res) {
     let appName = req.params.appName
     let businessID = req.params.businessID
@@ -43,14 +47,19 @@ module.exports = {
     return fbase.fetchData(db, ['businesses/', businessID, '/information/', tableName, '/'].join(''))
   },
 
+  // Filter by column type and map it to get only each column key
   filterEntities: function (data) {
     return data
       .filter(e => e.type === 'entity')
       .map(e => e.key)
   },
 
+  // Handle raw data object from firebase to convert to CSV
   convertTable: function (req, res, data) {
+    // Converts data object (row object) to an array and maps it to get only the inner info of the row
     const arr = Object.keys(data).map(k => data[k])
+
+    // Get the proper title of each column instead of its key
     const beauty = req.sortedColumns.map(c => columnTitles[c])
 
     return json2csv({data: arr, fields: req.sortedColumns, fieldNames: beauty})
@@ -68,6 +77,7 @@ module.exports = {
       ACL: 'public-read'
     }
 
+    // Upload file to amazon S3
     s3.putObject(params, function (err, data) {
       if (err) return console.log('error aws', err)
       console.log('data aws', data)
