@@ -14,7 +14,8 @@
     "body-parser": "^1.15.2",
     "express": "^4.14.0",
     "firebase-admin": "^4.0.4",
-    "json2csv": "^3.7.3"
+    "json2csv": "^3.7.3",
+    "lodash": "^4.17.4"
   },
   "devDependencies": {
     "standard": "^8.6.0"

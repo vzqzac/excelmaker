@@ -11,17 +11,22 @@ module.exports = function (app) {
 
   router.route('/convert-table/:appName/:businessID/:tableName')
     .all(function (req, res, next) {
-      excelMakerController.dataHandler(req, res).dbData.then(data => {
-        req.xlsTable = excelMakerController.convertTable(data)
-        next()
-      })
-      .catch(error => res.status(204).send(error.message))
+      excelMakerController.getColumns(req, res)
+        .then(columns => {
+          req.sortedColumns = excelMakerController.sortData(columns)
+          req.entities = excelMakerController.filterEntities(columns)
+          return excelMakerController.getRows(req, res)
+        })
+        .then(rows => {
+          req.xlsTable = excelMakerController.convertTable(req, res, rows)
+          next()
+        })
+        .catch(error => res.status(204).send(error))
     })
-    .get(function (req, res) {
-      excelMakerController.downloadTable(req, res)
-    })
-    .post(function (req, res) {
-      excelMakerController.emailTable(req, res)
+    .get(excelMakerController.downloadTable)
+    .post(excelMakerController.emailTable)
+    .all(function (req, res) {
+      res.send({no:'no'})
     })
 
   app.use('/', router)

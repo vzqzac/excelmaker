@@ -12,44 +12,52 @@ const tablesPath = path.join(__dirname, '../tables')
 const http = require('http')
 const querystring = require('querystring')
 const AWS = require('aws-sdk')
+const _ = require('lodash')
 
 let newTablePath
 
 module.exports = {
-  dataHandler: function (req, res) {
+  getColumns: function (req, res) {
     let appName = req.params.appName
     let businessID = req.params.businessID
     let tableName = req.params.tableName
     let db = fbase[appName]()
-    let fetchedData = fbase.fetchData(db, 'businesses/' + businessID + '/information/' + tableName).then(data => data)
-    return {
-      dbData: fetchedData,
-      tableName: tableName
-    }
+    return fbase.fetchData(db, ['businesses/', businessID, '/default/entities/', tableName, '/columns/', (req.entity || '')].join(''))
   },
-  convertTable: function (data) {
-    let jsonArr = []
-    for (let key in data) {
-      if (data.hasOwnProperty(key)) {
-        let dataChild = data[key]
-        let prettyTitles = {}
-        for (let childKey in dataChild) {
-          if (childKey !== 'created_at') {
-            if (typeof dataChild[childKey] === 'object') {
-              for (let innerChKey in dataChild[childKey]) {
-                if (childKey !== 'created_at') {
-                  prettyTitles[columnTitles[childKey] + ' ' + columnTitles[innerChKey]] = dataChild[childKey][innerChKey]
-                }
-              }
-            } else {
-              prettyTitles[columnTitles[childKey]] = dataChild[childKey]
-            }
-          }
-        }
-        jsonArr.push(prettyTitles)
-      }
-    }
-    return json2csv({data: jsonArr})
+  sortData: function (data) {
+    return data
+      .sort((a, b) => {
+        if (a.order > b.order) return 1
+        if (a.order < b.order) return -1
+        return 0
+      })
+      .map(e => e.key)
+  },
+  getRows: function (req, res) {
+    let appName = req.params.appName
+    let businessID = req.params.businessID
+    let tableName = req.params.tableName
+    let db = fbase[appName]()
+    console.log(['businesses/', businessID, '/information/', tableName].join(''));
+    return fbase.fetchData(db, ['businesses/', businessID, '/information/', tableName, '/'].join(''))
+  },
+  filterEntities: function (data) {
+    return data
+      .filter(e => e.type === 'entity')
+      .map(e => e.key)
+  },
+  convertTable: function (req, res, data) {
+    let arr = Object.keys(data).map(k => data[k])
+    let mapped = arr
+      .map(e => {
+        let orderedObject = _.pick(e, req.sortedColumns)
+        return Object.keys(orderedObject).reduce(function (prettyTitles, k) {
+          if (typeof orderedObject[k] === 'object') console.log(true)
+          prettyTitles[columnTitles[k]] = orderedObject[k]
+          return prettyTitles
+        }, {})
+      })
+    return json2csv({data: mapped})
   },
   emailTable: function (request, response) {
     //AWS.config.loadFromPath('./aws/config.json')
