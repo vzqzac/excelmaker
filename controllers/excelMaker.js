@@ -12,7 +12,7 @@ const tablesPath = path.join(__dirname, '../tables')
 const http = require('http')
 const querystring = require('querystring')
 const AWS = require('aws-sdk')
-const _ = require('lodash')
+// const _ = require('lodash')
 
 let newTablePath
 
@@ -24,6 +24,7 @@ module.exports = {
     let db = fbase[appName]()
     return fbase.fetchData(db, ['businesses/', businessID, '/default/entities/', tableName, '/columns/', (req.entity || '')].join(''))
   },
+
   sortData: function (data) {
     return data
       .sort((a, b) => {
@@ -33,34 +34,30 @@ module.exports = {
       })
       .map(e => e.key)
   },
+
   getRows: function (req, res) {
     let appName = req.params.appName
     let businessID = req.params.businessID
     let tableName = req.params.tableName
     let db = fbase[appName]()
-    console.log(['businesses/', businessID, '/information/', tableName].join(''));
     return fbase.fetchData(db, ['businesses/', businessID, '/information/', tableName, '/'].join(''))
   },
+
   filterEntities: function (data) {
     return data
       .filter(e => e.type === 'entity')
       .map(e => e.key)
   },
+
   convertTable: function (req, res, data) {
-    let arr = Object.keys(data).map(k => data[k])
-    let mapped = arr
-      .map(e => {
-        let orderedObject = _.pick(e, req.sortedColumns)
-        return Object.keys(orderedObject).reduce(function (prettyTitles, k) {
-          if (typeof orderedObject[k] === 'object') console.log(true)
-          prettyTitles[columnTitles[k]] = orderedObject[k]
-          return prettyTitles
-        }, {})
-      })
-    return json2csv({data: mapped})
+    const arr = Object.keys(data).map(k => data[k])
+    const beauty = req.sortedColumns.map(c => columnTitles[c])
+
+    return json2csv({data: arr, fields: req.sortedColumns, fieldNames: beauty})
   },
+
   emailTable: function (request, response) {
-    //AWS.config.loadFromPath('./aws/config.json')
+    // AWS.config.loadFromPath('./aws/config.json')
 
     let s3 = new AWS.S3()
     let params = {
@@ -90,7 +87,6 @@ module.exports = {
         'Content-Length': Buffer.byteLength(postData)
       }
     }
-    console.log('before call to other api')
     let req = http.request(options, res => {
       response.sendStatus(res.statusCode)
       res.setEncoding('utf8')
@@ -100,6 +96,7 @@ module.exports = {
     req.write(postData)
     req.end()
   },
+
   downloadTable: function (req, res) {
     const resultTable = req.xlsTable
 

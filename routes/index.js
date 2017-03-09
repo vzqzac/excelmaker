@@ -21,12 +21,12 @@ module.exports = function (app) {
           req.xlsTable = excelMakerController.convertTable(req, res, rows)
           next()
         })
-        .catch(error => res.status(204).send(error))
+        .catch(error => res.status(500).send(error))
     })
     .get(excelMakerController.downloadTable)
     .post(excelMakerController.emailTable)
     .all(function (req, res) {
-      res.send({no:'no'})
+      res.send({no: 'no'})
     })
 
   app.use('/', router)
