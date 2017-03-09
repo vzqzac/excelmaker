@@ -18,7 +18,7 @@ module.exports = function (app) {
         .then(columns => {
           // Sort columns as in DB
           req.sortedColumns = excelMakerController.sortData(columns)
-          // Filter entities to hanfle before convert
+          // Filter entities to handle before convert
           req.entities = excelMakerController.filterEntities(columns)
           return excelMakerController.getRows(req, res)
         })
