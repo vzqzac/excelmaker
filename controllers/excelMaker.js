@@ -12,6 +12,7 @@ const tablesPath = path.join(__dirname, '../tables')
 const http = require('http')
 const querystring = require('querystring')
 const AWS = require('aws-sdk')
+const pdfMakerController = require('../controllers/pdfmaker')
 // const _ = require('lodash')
 
 let newTablePath
@@ -62,7 +63,7 @@ module.exports = {
     // Get the proper title of each column instead of its key
     const beauty = req.sortedColumns.map(c => columnTitles[c])
 
-    return json2csv({data: arr, fields: req.sortedColumns, fieldNames: beauty})
+    return json2csv({ data: arr, fields: req.sortedColumns, fieldNames: beauty })
   },
 
   emailTable: function (request, response) {
@@ -72,8 +73,8 @@ module.exports = {
     let params = {
       Bucket: 'ez-table',
       Key: request.params.tableName,
-      Body: request.xlsTable,
-      ContentType: 'csv',
+      Body: req.query.doctype === 'excel' ? request.xlsTable : fs.readFileSync(path.join(__dirname, '../tables/tabla.pdf')),
+      ContentType: req.query.doctype === 'excel' ? 'csv' : 'pdf',
       ACL: 'public-read'
     }
 
@@ -86,7 +87,7 @@ module.exports = {
     let postData = querystring.stringify({
       'email': request.query.email,
       'tname': request.params.tableName,
-      'ext': 'csv'
+      'ext': req.query.doctype === 'excel' ? 'csv' : 'pdf'
     })
     let options = {
       hostname: 'ondecode-mailer.herokuapp.com',
@@ -115,7 +116,12 @@ module.exports = {
     if (!fs.existsSync(tablesPath)) {
       fs.mkdirSync(tablesPath)
     }
-    fs.writeFileSync(newTablePath, resultTable)
+    if (req.query.doctype === 'excel')
+      fs.writeFileSync(newTablePath, resultTable)
+    else{
+      pdfMakerController.createHtmlTemplate(resultTable);
+      newTablePath = pdfMakerController.generatePdf();
+    }
     res.download(newTablePath)
   }
 }

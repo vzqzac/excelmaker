@@ -5,9 +5,9 @@ const phantomjs = require('phantomjs');
 const binPath = phantomjs.path;
 
 module.exports {
-    createHtmlTemplate: function () {
+    createHtmlTemplate: function (data) {
 
-        let data = fs.readFileSync('./deal-2.csv', 'utf8');
+        //let data = fs.readFileSync(path, 'utf8');
 
         let data = data.split("\n");
 
@@ -55,6 +55,7 @@ module.exports {
             stdio: 'pipe',
             encoding: 'utf-8'
         });
+        return path.join(__dirname, '../tables/tabla.pdf');
     }
 }
 

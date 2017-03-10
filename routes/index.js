@@ -3,7 +3,7 @@ const router = express.Router()
 const excelMakerController = require('../controllers/excelMaker')
 
 module.exports = function (app) {
-  
+
   // Middleware for CORS
   router.use(function (req, res, next) {
     res.header('Access-Control-Allow-Origin', '*')
@@ -31,15 +31,7 @@ module.exports = function (app) {
         .catch(error => res.status(500).send(error))
     })
     .get(function (req, res) {
-      switch (req.query.doctype) {
-        case 'excel':
           excelMakerController.downloadTable(req, res)
-          break
-        case 'pdf':
-          // pdfController.downloadPDF(req, res) o algo asi
-          break
-        default:
-          res.status(400).send('Bad request')
       }
     })
     .post(excelMakerController.emailTable)
