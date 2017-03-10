@@ -33,7 +33,7 @@ module.exports = function (app) {
     .get(function (req, res) {
           excelMakerController.downloadTable(req, res)
       }
-    })
+    )
     .post(excelMakerController.emailTable)
     .all(function (req, res) {
       res.send({no: 'no'})
