@@ -35,6 +35,34 @@ module.exports = {
         return 0
       })
       .map(e => e.key)
+      // .concat([
+      //   'ticketsnumber',
+      //   'ticketsticketreceived',
+      //   'ticketsstorenumber',
+      //   'ticketstype',
+      //   'ticketsticketclient',
+      //   'ticketscontactnumber',
+      //   'ticketsstorecontactnumber',
+      //   'ticketsstoremanageremail',
+      //   'ticketsaddress',
+      //   'ticketsowner',
+      //   'ticketswarranty',
+      //   'ticketsissue',
+      //   'ticketscontractorname',
+      //   'ticketsexpectedstartdate',
+      //   'ticketsexpectedcompletiondate',
+      //   'ticketsstatus',
+      //   'ticketsnotes',
+      //   'leaseresponsibilitiesleasedate',
+      //   'leaseresponsibilitiesterminationdate',
+      //   'leaseresponsibilitieshazardmaterialandsustances',
+      //   'leaseresponsibilitiesexteriormaintenancebstructure',
+      //   'leaseresponsibilitiesabatement',
+      //   'leaseresponsibilitiescasualty',
+      //   'leaseresponsibilitiesfirealarminstallation',
+      //   'leaseresponsibilitiesfirealarmmonitoring',
+      //   'leaseresponsibilitiesspirnklersystem'
+      // ])
   },
 
   // NOTE: this could me moved into a 'UTIL' module
@@ -56,10 +84,29 @@ module.exports = {
   // Handle raw data object from firebase to convert to CSV
   convertTable: function (req, res, data) {
     // Converts data object (row object) to an array and maps it to get only the inner info of the row
-    const arr = Object.keys(data).map(k => data[k])
+    const arr = Object.keys(data)
+      .map(k => {
+        let row = data[k]
+        return Object.keys(row)
+          .reduce((newR, r) => {
+            if (typeof row[r] !== 'object') return newR
+        //     let entity = row[r]// if (r === 'notes')
+        //     Object.keys(entity).forEach(k => {
+        //       if (k === 'notes') {
+        //         newR[r + k] = entity[k].reduce((notes, note) => [notes,note].join('\n'), '')
+        //         return
+        //       }
+        //       return newR[r + k] = entity[k]
+        //     })
+        //     return newR
+          }, row)
+      })
 
     // Get the proper title of each column instead of its key
-    const beauty = req.sortedColumns.map(c => columnTitles[c])
+    const beauty = req.sortedColumns.map(c => {
+      //console.log(c, columnTitles[c]);
+      return columnTitles[c]
+    })
 
     return json2csv({data: arr, fields: req.sortedColumns, fieldNames: beauty})
   },
@@ -108,7 +155,6 @@ module.exports = {
 
   downloadTable: function (req, res) {
     const resultTable = req.xlsTable
-
     newTablePath = path.join(tablesPath, req.params.tableName + '.csv')
 
     if (!fs.existsSync(tablesPath)) {

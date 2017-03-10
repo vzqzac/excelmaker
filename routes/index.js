@@ -14,6 +14,7 @@ module.exports = function (app) {
   router.route('/convert-table/:appName/:businessID/:tableName')
     // Prepare data
     .all(function (req, res, next) {
+      console.log(req.params);
       excelMakerController.getColumns(req, res)
         .then(columns => {
           // Sort columns as in DB
@@ -27,7 +28,10 @@ module.exports = function (app) {
           req.xlsTable = excelMakerController.convertTable(req, res, rows)
           next()
         })
-        .catch(error => res.status(500).send(error))
+        .catch(error => {
+          console.log('error', error);
+          res.status(500).send(error)
+        })
     })
     .get(excelMakerController.downloadTable)
     .post(excelMakerController.emailTable)
