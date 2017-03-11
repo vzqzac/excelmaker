@@ -119,11 +119,8 @@ module.exports = {
     if (req.query.doctype === 'excel')
       fs.writeFileSync(newTablePath, resultTable)
     else{
-      console.log("working");
       pdfMakerController.createHtmlTemplate(resultTable);
-      console.log("working1");
       newTablePath = pdfMakerController.generatePdf();
-      console.log("working3");
     }
     res.download(newTablePath)
   }
