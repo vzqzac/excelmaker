@@ -120,7 +120,7 @@ module.exports = {
       fs.writeFileSync(newTablePath, resultTable)
     else {
       pdfMakerController.createHtmlTemplate(resultTable);
-      newTablePath = pdfMakerController.generatePdf();
+      newTablePath = pdfMakerController.generatePdf(req.params.tableName);
     }
     res.download(newTablePath)
   }
