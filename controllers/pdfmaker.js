@@ -9,10 +9,11 @@ const renderpdfPath = path.join(__dirname, 'renderpdf.js')
 module.exports = {
     createHtmlTemplate: function (data) {
         data = data.split("\n");
-
+        
         for (let i = 0; i < data.length; i++) {
+            data[i] = data[i].replace(/\\r/g, '');
             data[i] = data[i].split(",");
-            for(let j = 0; j < data[i].length; j++) {
+            for (let j = 0; j < data[i].length; j++) {
                 data[i][j] = data[i][j].replace(/"/g, '');
             }
         }
