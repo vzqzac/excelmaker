@@ -84,7 +84,7 @@ module.exports = {
     let postData = querystring.stringify({
       'email': request.query.email,
       'tname': request.params.tableName,
-      'ext': req.query.doctype === 'excel' ? 'csv' : 'pdf'
+      'ext': request.query.doctype === 'excel' ? 'csv' : 'pdf'
     })
     let options = {
       hostname: 'ondecode-mailer.herokuapp.com',
