@@ -23,48 +23,37 @@ module.exports = {
     let appName = req.params.appName
     let businessID = req.params.businessID
     let tableName = req.params.tableName
-    console.log(appName, businessID, tableName);
     let db = fbase[appName]()
     return fbase.fetchData(db, ['businesses/', businessID, '/default/entities/', tableName, '/columns/', (req.entity || '')].join(''))
   },
 
   sortData: function (data) {
     // Sort by column order and map it to get only each column key
-    return data
+    let columns = data instanceof Array ? data : Object.keys(data)
+    // if (data instanceof Array) {
+    //   return data
+    //     .sort((a, b) => {
+    //       if (a.order > b.order) return 1
+    //       if (a.order < b.order) return -1
+    //       return 0
+    //     })
+    //     .map(e => e.key)
+    // }
+
+    return columns
       .sort((a, b) => {
-        if (a.order > b.order) return 1
-        if (a.order < b.order) return -1
+        if (data[a].order > data[b].order) return 1
+        if (data[a].order < data[b].order) return -1
         return 0
       })
-      .map(e => e.key)
-      // .concat([
-      //   'ticketsnumber',
-      //   'ticketsticketreceived',
-      //   'ticketsstorenumber',
-      //   'ticketstype',
-      //   'ticketsticketclient',
-      //   'ticketscontactnumber',
-      //   'ticketsstorecontactnumber',
-      //   'ticketsstoremanageremail',
-      //   'ticketsaddress',
-      //   'ticketsowner',
-      //   'ticketswarranty',
-      //   'ticketsissue',
-      //   'ticketscontractorname',
-      //   'ticketsexpectedstartdate',
-      //   'ticketsexpectedcompletiondate',
-      //   'ticketsstatus',
-      //   'ticketsnotes',
-      //   'leaseresponsibilitiesleasedate',
-      //   'leaseresponsibilitiesterminationdate',
-      //   'leaseresponsibilitieshazardmaterialandsustances',
-      //   'leaseresponsibilitiesexteriormaintenancebstructure',
-      //   'leaseresponsibilitiesabatement',
-      //   'leaseresponsibilitiescasualty',
-      //   'leaseresponsibilitiesfirealarminstallation',
-      //   'leaseresponsibilitiesfirealarmmonitoring',
-      //   'leaseresponsibilitiesspirnklersystem'
-      // ])
+      .reduce((cols, current) => {
+        let type = data[current].type
+        if (type !== 'entity' && type !== 'files' && type !== 'notes') {
+          cols.keys.push(data[current].key)
+          cols.titles.push(data[current].title)
+        }
+        return cols
+      }, { keys: [], titles: [] })
   },
 
   // NOTE: this could me moved into a 'UTIL' module
@@ -76,41 +65,13 @@ module.exports = {
     return fbase.fetchData(db, ['businesses/', businessID, '/information/', tableName, '/'].join(''))
   },
 
-  // Filter by column type and map it to get only each column key
-  filterEntities: function (data) {
-    return data
-      .filter(e => e.type === 'entity')
-      .map(e => e.key)
-  },
-
   // Handle raw data object from firebase to convert to CSV
   convertTable: function (req, res, data) {
     // Converts data object (row object) to an array and maps it to get only the inner info of the row
     const arr = Object.keys(data)
-      .map(k => {
-        let row = data[k]
-        return Object.keys(row)
-          .reduce((newR, r) => {
-            if (typeof row[r] !== 'object') return newR
-        //     let entity = row[r]// if (r === 'notes')
-        //     Object.keys(entity).forEach(k => {
-        //       if (k === 'notes') {
-        //         newR[r + k] = entity[k].reduce((notes, note) => [notes,note].join('\n'), '')
-        //         return
-        //       }
-        //       return newR[r + k] = entity[k]
-        //     })
-        //     return newR
-          }, row)
-      })
-
+      .map(k => data[k])
     // Get the proper title of each column instead of its key
-    const beauty = req.sortedColumns.map(c => {
-      //console.log(c, columnTitles[c]);
-      return columnTitles[c]
-    })
-
-    return json2csv({ data: arr, fields: req.sortedColumns, fieldNames: beauty })
+    return json2csv({ data: arr, fields: req.sortedColumns, fieldNames: req.columnTitles })
   },
 
   emailTable: function (request, response) {

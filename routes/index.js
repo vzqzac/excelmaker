@@ -15,13 +15,15 @@ module.exports = function (app) {
   router.route('/convert-table/:appName/:businessID/:tableName')
     // Prepare data
     .all(function (req, res, next) {
-      console.log(req.params);
       excelMakerController.getColumns(req, res)
         .then(columns => {
           // Sort columns as in DB
-          req.sortedColumns = excelMakerController.sortData(columns)
+          let cols = excelMakerController.sortData(columns)
+          //return res.send({cols})
+          req.sortedColumns = cols.keys
+          req.columnTitles = cols.titles
           // Filter entities to handle before convert
-          req.entities = excelMakerController.filterEntities(columns)
+          // req.entities = excelMakerController.filterEntities(columns)
           return excelMakerController.getRows(req, res)
         })
         .then(rows => {
