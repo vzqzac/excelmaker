@@ -24,23 +24,12 @@ module.exports = {
     let businessID = req.params.businessID
     let tableName = req.params.tableName
     let db = fbase[appName]()
-    return fbase.fetchData(db, ['businesses/', businessID, '/default/entities/', tableName, '/columns/', (req.entity || '')].join(''))
+    return fbase.fetchData(db, ['businesses/', businessID, '/default/entities/', tableName, '/columns'].join(''))
   },
 
   sortData: function (data) {
     // Sort by column order and map it to get only each column key
-    let columns = data instanceof Array ? data : Object.keys(data)
-    // if (data instanceof Array) {
-    //   return data
-    //     .sort((a, b) => {
-    //       if (a.order > b.order) return 1
-    //       if (a.order < b.order) return -1
-    //       return 0
-    //     })
-    //     .map(e => e.key)
-    // }
-
-    return columns
+    return Object.keys(data)
       .sort((a, b) => {
         if (data[a].order > data[b].order) return 1
         if (data[a].order < data[b].order) return -1
