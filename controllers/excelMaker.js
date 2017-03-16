@@ -73,8 +73,8 @@ module.exports = {
     let params = {
       Bucket: 'ez-table',
       Key: request.params.tableName,
-      Body: req.query.doctype === 'excel' ? request.xlsTable : fs.readFileSync(path.join(__dirname, '../tables/tabla.pdf')),
-      ContentType: req.query.doctype === 'excel' ? 'csv' : 'pdf',
+      Body: request.query.doctype === 'excel' ? request.xlsTable : fs.readFileSync(path.join(__dirname, '../tables/tabla.pdf')),
+      ContentType: request.query.doctype === 'excel' ? 'csv' : 'pdf',
       ACL: 'public-read'
     }
 
